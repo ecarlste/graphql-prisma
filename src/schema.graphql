@@ -1,0 +1,106 @@
+type Query {
+  users(query: String): [User!]!
+  me: User!
+  posts(query: String): [Post!]!
+  post: Post!
+  comments: [Comment!]!
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): User!
+  createPost(input: CreatePostInput!): Post!
+  updatePost(id: ID!, input: UpdatePostInput!): Post!
+  deletePost(id: ID!): Post!
+  createComment(input: CreateCommentInput!): Comment!
+  updateComment(id: ID!, input: UpdateCommentInput!): Comment!
+  deleteComment(id: ID!): Comment!
+}
+
+type Subscription {
+  postEvent: PostSubscriptionPayload!
+  commentEvent(postId: ID!): CommentSubscriptionPayload!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  age: Int
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+  age: Int
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  age: Int
+  posts: [Post!]!
+  comments: [Comment!]!
+}
+
+input CreatePostInput {
+  title: String!
+  body: String!
+  published: Boolean!
+  author: ID!
+}
+
+input UpdatePostInput {
+  title: String
+  body: String
+  published: Boolean
+}
+
+type Post {
+  id: ID!
+  title: String!
+  body: String!
+  published: Boolean!
+  author: User!
+  comments: [Comment!]!
+}
+
+enum PostEventType {
+  POST_CREATED
+  POST_UPDATED
+  POST_DELETED
+}
+
+type PostSubscriptionPayload {
+  eventType: PostEventType!
+  post: Post!
+}
+
+input CreateCommentInput {
+  text: String!
+  author: ID!
+  post: ID!
+}
+
+input UpdateCommentInput {
+  text: String
+}
+
+type Comment {
+  id: ID!
+  text: String!
+  author: User!
+  post: Post!
+}
+
+enum CommentEventType {
+  COMMENT_CREATED
+  COMMENT_UPDATED
+  COMMENT_DELETED
+}
+
+type CommentSubscriptionPayload {
+  eventType: CommentEventType!
+  comment: Comment!
+}
