@@ -331,6 +331,9 @@ export interface UserWhereInput {
   posts_every?: PostWhereInput;
   posts_some?: PostWhereInput;
   posts_none?: PostWhereInput;
+  comments_every?: CommentWhereInput;
+  comments_some?: CommentWhereInput;
+  comments_none?: CommentWhereInput;
   AND?: UserWhereInput[] | UserWhereInput;
   OR?: UserWhereInput[] | UserWhereInput;
   NOT?: UserWhereInput[] | UserWhereInput;
@@ -383,16 +386,16 @@ export type UserWhereUniqueInput = AtLeastOne<{
 
 export interface CommentCreateInput {
   text: String;
-  author: UserCreateOneInput;
+  author: UserCreateOneWithoutCommentsInput;
   post: PostCreateOneWithoutCommentsInput;
 }
 
-export interface UserCreateOneInput {
-  create?: UserCreateInput;
+export interface UserCreateOneWithoutCommentsInput {
+  create?: UserCreateWithoutCommentsInput;
   connect?: UserWhereUniqueInput;
 }
 
-export interface UserCreateInput {
+export interface UserCreateWithoutCommentsInput {
   name: String;
   email: String;
   posts?: PostCreateManyWithoutAuthorInput;
@@ -417,7 +420,7 @@ export interface CommentCreateManyWithoutPostInput {
 
 export interface CommentCreateWithoutPostInput {
   text: String;
-  author: UserCreateOneInput;
+  author: UserCreateOneWithoutCommentsInput;
 }
 
 export interface PostCreateOneWithoutCommentsInput {
@@ -440,22 +443,33 @@ export interface UserCreateOneWithoutPostsInput {
 export interface UserCreateWithoutPostsInput {
   name: String;
   email: String;
+  comments?: CommentCreateManyWithoutAuthorInput;
+}
+
+export interface CommentCreateManyWithoutAuthorInput {
+  create?: CommentCreateWithoutAuthorInput[] | CommentCreateWithoutAuthorInput;
+  connect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+}
+
+export interface CommentCreateWithoutAuthorInput {
+  text: String;
+  post: PostCreateOneWithoutCommentsInput;
 }
 
 export interface CommentUpdateInput {
   text?: String;
-  author?: UserUpdateOneRequiredInput;
+  author?: UserUpdateOneRequiredWithoutCommentsInput;
   post?: PostUpdateOneRequiredWithoutCommentsInput;
 }
 
-export interface UserUpdateOneRequiredInput {
-  create?: UserCreateInput;
-  update?: UserUpdateDataInput;
-  upsert?: UserUpsertNestedInput;
+export interface UserUpdateOneRequiredWithoutCommentsInput {
+  create?: UserCreateWithoutCommentsInput;
+  update?: UserUpdateWithoutCommentsDataInput;
+  upsert?: UserUpsertWithoutCommentsInput;
   connect?: UserWhereUniqueInput;
 }
 
-export interface UserUpdateDataInput {
+export interface UserUpdateWithoutCommentsDataInput {
   name?: String;
   email?: String;
   posts?: PostUpdateManyWithoutAuthorInput;
@@ -516,7 +530,7 @@ export interface CommentUpdateWithWhereUniqueWithoutPostInput {
 
 export interface CommentUpdateWithoutPostDataInput {
   text?: String;
-  author?: UserUpdateOneRequiredInput;
+  author?: UserUpdateOneRequiredWithoutCommentsInput;
 }
 
 export interface CommentUpsertWithWhereUniqueWithoutPostInput {
@@ -635,9 +649,9 @@ export interface PostUpdateManyDataInput {
   published?: Boolean;
 }
 
-export interface UserUpsertNestedInput {
-  update: UserUpdateDataInput;
-  create: UserCreateInput;
+export interface UserUpsertWithoutCommentsInput {
+  update: UserUpdateWithoutCommentsDataInput;
+  create: UserCreateWithoutCommentsInput;
 }
 
 export interface PostUpdateOneRequiredWithoutCommentsInput {
@@ -664,6 +678,41 @@ export interface UserUpdateOneRequiredWithoutPostsInput {
 export interface UserUpdateWithoutPostsDataInput {
   name?: String;
   email?: String;
+  comments?: CommentUpdateManyWithoutAuthorInput;
+}
+
+export interface CommentUpdateManyWithoutAuthorInput {
+  create?: CommentCreateWithoutAuthorInput[] | CommentCreateWithoutAuthorInput;
+  delete?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+  connect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+  set?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+  disconnect?: CommentWhereUniqueInput[] | CommentWhereUniqueInput;
+  update?:
+    | CommentUpdateWithWhereUniqueWithoutAuthorInput[]
+    | CommentUpdateWithWhereUniqueWithoutAuthorInput;
+  upsert?:
+    | CommentUpsertWithWhereUniqueWithoutAuthorInput[]
+    | CommentUpsertWithWhereUniqueWithoutAuthorInput;
+  deleteMany?: CommentScalarWhereInput[] | CommentScalarWhereInput;
+  updateMany?:
+    | CommentUpdateManyWithWhereNestedInput[]
+    | CommentUpdateManyWithWhereNestedInput;
+}
+
+export interface CommentUpdateWithWhereUniqueWithoutAuthorInput {
+  where: CommentWhereUniqueInput;
+  data: CommentUpdateWithoutAuthorDataInput;
+}
+
+export interface CommentUpdateWithoutAuthorDataInput {
+  text?: String;
+  post?: PostUpdateOneRequiredWithoutCommentsInput;
+}
+
+export interface CommentUpsertWithWhereUniqueWithoutAuthorInput {
+  where: CommentWhereUniqueInput;
+  update: CommentUpdateWithoutAuthorDataInput;
+  create: CommentCreateWithoutAuthorInput;
 }
 
 export interface UserUpsertWithoutPostsInput {
@@ -702,10 +751,18 @@ export interface PostUpdateManyMutationInput {
   published?: Boolean;
 }
 
+export interface UserCreateInput {
+  name: String;
+  email: String;
+  posts?: PostCreateManyWithoutAuthorInput;
+  comments?: CommentCreateManyWithoutAuthorInput;
+}
+
 export interface UserUpdateInput {
   name?: String;
   email?: String;
   posts?: PostUpdateManyWithoutAuthorInput;
+  comments?: CommentUpdateManyWithoutAuthorInput;
 }
 
 export interface UserUpdateManyMutationInput {
@@ -792,6 +849,17 @@ export interface UserPromise extends Promise<User>, Fragmentable {
       last?: Int;
     }
   ) => T;
+  comments: <T = FragmentableArray<Comment>>(
+    args?: {
+      where?: CommentWhereInput;
+      orderBy?: CommentOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
 }
 
 export interface UserSubscription
@@ -804,6 +872,17 @@ export interface UserSubscription
     args?: {
       where?: PostWhereInput;
       orderBy?: PostOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  comments: <T = Promise<AsyncIterator<CommentSubscription>>>(
+    args?: {
+      where?: CommentWhereInput;
+      orderBy?: CommentOrderByInput;
       skip?: Int;
       after?: String;
       before?: String;
