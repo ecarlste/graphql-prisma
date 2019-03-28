@@ -1,23 +1,24 @@
 {
-  "name": "graphql-basics",
+  "name": "graphql-prisma",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/index.js --ext js,graphql --exec babel-node",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "get-schema": "graphql get-schema -p prisma"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ecarlste/graphql-basics.git"
+    "url": "git+https://github.com/ecarlste/graphql-prisma.git"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ecarlste/graphql-basics/issues"
+    "url": "https://github.com/ecarlste/graphql-prisma/issues"
   },
-  "homepage": "https://github.com/ecarlste/graphql-basics#readme",
+  "homepage": "https://github.com/ecarlste/graphql-prisma#readme",
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.4.0",
@@ -30,13 +31,13 @@
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-react": "^7.12.4",
+    "graphql-cli": "^3.0.11",
     "nodemon": "^1.18.10",
     "prettier": "^1.16.4"
   },
   "dependencies": {
     "graphql-yoga": "^1.17.4",
-    "lodash": "^4.17.11",
-    "prisma-client-lib": "^1.29.2",
+    "prisma-binding": "^2.3.10",
     "uuid": "^3.3.2"
   }
 }

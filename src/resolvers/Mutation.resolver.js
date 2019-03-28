@@ -1,21 +1,22 @@
 import uuidv4 from 'uuid/v4';
 
 export default {
-  createUser(_, args, { db }) {
-    const emailTaken = db.users.some(user => user.email === args.input.email);
+  createUser(_, args, { prisma }) {
+    const emailTaken = prisma.$exists({ email: args.data.email });
+    // const emailTaken = db.users.some(user => user.email === args.input.email);
 
     if (emailTaken) {
       throw new Error('Email already in use.');
     }
 
-    const user = {
-      id: uuidv4(),
-      ...args.input
-    };
+    // const user = {
+    //   id: uuidv4(),
+    //   ...args.input
+    // };
 
-    db.users.push(user);
+    // db.users.push(user);
 
-    return user;
+    // return user;
   },
   updateUser(_, { id, input }, { db }) {
     const userToUpdate = db.users.find(user => user.id === id);

@@ -1,5 +1,5 @@
 export default {
-  users(_, args, { prisma }) {
+  users(_, args, { prisma }, info) {
     const opArgs = {};
 
     if (args.query) {
@@ -15,17 +15,9 @@ export default {
       };
     }
 
-    return prisma.users(opArgs);
+    return prisma.query.users(opArgs, info);
   },
-  me() {
-    return {
-      id: '123',
-      name: 'Erik',
-      email: 'ecarlste@gmail.com',
-      age: null
-    };
-  },
-  posts(_, args, { prisma }) {
+  async posts(_, args, { prisma }, info) {
     const opArgs = {};
 
     if (args.query) {
@@ -41,7 +33,18 @@ export default {
       };
     }
 
-    return prisma.posts(opArgs);
+    return prisma.query.posts(opArgs, info);
+  },
+  comments(_, _1, { prisma }, info) {
+    return prisma.query.comments(null, info);
+  },
+  me() {
+    return {
+      id: '123',
+      name: 'Erik',
+      email: 'ecarlste@gmail.com',
+      age: null
+    };
   },
   post() {
     return {
@@ -50,8 +53,5 @@ export default {
       body: 'best post NA... duh...',
       published: false
     };
-  },
-  comments(_, args, { prisma }) {
-    return prisma.comments();
   }
 };

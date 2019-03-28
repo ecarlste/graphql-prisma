@@ -1,10 +1,3 @@
-const Post = {
-  author(parent, _, { prisma }) {
-    return prisma.post({ id: parent.id }).author();
-  },
-  comments(parent, _, { prisma }) {
-    return prisma.post({ id: parent.id }).comments();
-  }
-};
+const Post = {};
 
 export default Post;
