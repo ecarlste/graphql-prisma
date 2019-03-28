@@ -1,12 +1,21 @@
 export default {
-  users(_, args, { db }) {
-    if (!args.query) {
-      return db.users;
+  users(_, args, { prisma }) {
+    const opArgs = {};
+
+    if (args.query) {
+      opArgs.where = {
+        OR: [
+          {
+            name_contains: args.query
+          },
+          {
+            email_contains: args.query
+          }
+        ]
+      };
     }
 
-    return db.users.filter(user => {
-      return user.name.toLowerCase().includes(args.query.toLowerCase());
-    });
+    return prisma.users(opArgs);
   },
   me() {
     return {
@@ -16,16 +25,23 @@ export default {
       age: null
     };
   },
-  posts(_, args, { db }) {
-    if (!args.query) {
-      return db.posts;
+  posts(_, args, { prisma }) {
+    const opArgs = {};
+
+    if (args.query) {
+      opArgs.where = {
+        OR: [
+          {
+            title_contains: args.query
+          },
+          {
+            body_contains: args.query
+          }
+        ]
+      };
     }
 
-    return db.posts.filter(
-      post =>
-        post.title.toLowerCase().includes(args.query.toLowerCase()) ||
-        post.body.toLowerCase().includes(args.query.toLowerCase())
-    );
+    return prisma.posts(opArgs);
   },
   post() {
     return {
@@ -35,7 +51,7 @@ export default {
       published: false
     };
   },
-  comments(_, _1, { db }) {
-    return db.comments;
+  comments(_, args, { prisma }) {
+    return prisma.comments();
   }
 };

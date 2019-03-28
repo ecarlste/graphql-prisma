@@ -1,8 +1,10 @@
-export default {
-  author(parent, _, { db }) {
-    return db.users.find(user => user.id === parent.author);
+const Comment = {
+  author(parent, _, { prisma }) {
+    return prisma.comment({ id: parent.id }).author();
   },
-  post(parent, _, { db }) {
-    return db.posts.find(post => post.id === parent.post);
+  post(parent, _, { prisma }) {
+    return prisma.comment({ id: parent.id }).post();
   }
 };
+
+export default Comment;
