@@ -1,46 +1,38 @@
 import uuidv4 from 'uuid/v4';
 
 export default {
-  createUser(_, args, { prisma }) {
-    const emailTaken = prisma.$exists({ email: args.data.email });
-    // const emailTaken = db.users.some(user => user.email === args.input.email);
+  async createUser(_, args, { prisma }, info) {
+    const emailTaken = await prisma.exists.User({ email: args.data.email });
 
     if (emailTaken) {
       throw new Error('Email already in use.');
     }
 
-    // const user = {
-    //   id: uuidv4(),
-    //   ...args.input
-    // };
-
-    // db.users.push(user);
-
-    // return user;
+    return prisma.mutation.createUser({ data: args.data }, info);
   },
-  updateUser(_, { id, input }, { db }) {
+  updateUser(_, { id, data }, { db }) {
     const userToUpdate = db.users.find(user => user.id === id);
 
     if (!userToUpdate) {
       throw new Error('User with specified ID does not exist.');
     }
 
-    if (typeof input.email === 'string') {
-      const isEmailInUse = db.users.find(user => user.email === input.email);
+    if (typeof data.email === 'string') {
+      const isEmailInUse = db.users.find(user => user.email === data.email);
 
       if (isEmailInUse) {
         throw new Error('Email already in use.');
       }
 
-      userToUpdate.email = input.email;
+      userToUpdate.email = data.email;
     }
 
-    if (typeof input.name === 'string') {
-      userToUpdate.name = input.name;
+    if (typeof data.name === 'string') {
+      userToUpdate.name = data.name;
     }
 
-    if (typeof input.age !== 'undefined') {
-      userToUpdate.age = input.age;
+    if (typeof data.age !== 'undefined') {
+      userToUpdate.age = data.age;
     }
 
     return userToUpdate;
@@ -71,7 +63,7 @@ export default {
     return user;
   },
   createPost(_, args, { db, pubsub }) {
-    const userExists = db.users.some(user => user.id === args.input.author);
+    const userExists = db.users.some(user => user.id === args.data.author);
 
     if (!userExists) {
       throw new Error('Specified user ID not found.');
@@ -79,7 +71,7 @@ export default {
 
     const post = {
       id: uuidv4(),
-      ...args.input
+      ...args.data
     };
 
     db.posts.push(post);
@@ -90,7 +82,7 @@ export default {
 
     return post;
   },
-  updatePost(_, { id, input }, { db, pubsub }) {
+  updatePost(_, { id, data }, { db, pubsub }) {
     const postToUpdate = db.posts.find(post => post.id === id);
     const wasPublished = postToUpdate.published;
 
@@ -98,16 +90,16 @@ export default {
       throw new Error('Post with specified ID does not exist.');
     }
 
-    if (typeof input.title === 'string') {
-      postToUpdate.title = input.title;
+    if (typeof data.title === 'string') {
+      postToUpdate.title = data.title;
     }
 
-    if (typeof input.body === 'string') {
-      postToUpdate.body = input.body;
+    if (typeof data.body === 'string') {
+      postToUpdate.body = data.body;
     }
 
-    if (typeof input.published === 'boolean') {
-      postToUpdate.published = input.published;
+    if (typeof data.published === 'boolean') {
+      postToUpdate.published = data.published;
     }
 
     if (wasPublished || postToUpdate.published) {
@@ -133,10 +125,8 @@ export default {
     return post;
   },
   createComment(_, args, { db, pubsub }) {
-    const userExists = db.users.some(user => user.id === args.input.author);
-    const publishedPostExists = db.posts.some(
-      post => post.id === args.input.post && post.published
-    );
+    const userExists = db.users.some(user => user.id === args.data.author);
+    const publishedPostExists = db.posts.some(post => post.id === args.data.post && post.published);
 
     // this is a useless error, 3 things could be wrong and the client would have to perform 3 bad requests to find that out
     if (!userExists || !publishedPostExists) {
@@ -145,7 +135,7 @@ export default {
 
     const comment = {
       id: uuidv4(),
-      ...args.input
+      ...args.data
     };
 
     db.comments.push(comment);
@@ -155,18 +145,18 @@ export default {
 
     return comment;
   },
-  updateComment(_, { id, input }, { db, pubsub }) {
+  updateComment(_, { id, data }, { db, pubsub }) {
     const commentToUpdate = db.comments.find(comment => comment.id === id);
 
     if (!commentToUpdate) {
       throw new Error('Comment with specified ID not found.');
     }
 
-    if (typeof input.text === 'string') {
-      commentToUpdate.text = input.text;
+    if (typeof data.text === 'string') {
+      commentToUpdate.text = data.text;
     }
 
-    if (Object.keys(input).length > 0) {
+    if (Object.keys(data).length > 0) {
       pubsub.publish(`comment ${commentToUpdate.post}`, {
         commentEvent: { eventType: 'COMMENT_UPDATED', comment: commentToUpdate }
       });

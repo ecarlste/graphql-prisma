@@ -7,14 +7,14 @@ type Query {
 }
 
 type Mutation {
-  createUser(input: CreateUserInput!): User!
-  updateUser(id: ID!, input: UpdateUserInput!): User!
+  createUser(data: CreateUserInput!): User!
+  updateUser(id: ID!, data: UpdateUserInput!): User!
   deleteUser(id: ID!): User!
-  createPost(input: CreatePostInput!): Post!
-  updatePost(id: ID!, input: UpdatePostInput!): Post!
+  createPost(data: CreatePostInput!): Post!
+  updatePost(id: ID!, data: UpdatePostInput!): Post!
   deletePost(id: ID!): Post!
-  createComment(input: CreateCommentInput!): Comment!
-  updateComment(id: ID!, input: UpdateCommentInput!): Comment!
+  createComment(data: CreateCommentInput!): Comment!
+  updateComment(id: ID!, data: UpdateCommentInput!): Comment!
   deleteComment(id: ID!): Comment!
 }
 
