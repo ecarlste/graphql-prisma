@@ -19,8 +19,8 @@ type Mutation {
 }
 
 type Subscription {
-  postEvent: PostSubscriptionPayload!
-  commentEvent(postId: ID!): CommentSubscriptionPayload!
+  post: PostSubscriptionPayload!
+  comment(postId: ID!): CommentSubscriptionPayload!
 }
 
 input CreateUserInput {
@@ -63,15 +63,9 @@ type Post {
   comments: [Comment!]!
 }
 
-enum PostEventType {
-  POST_CREATED
-  POST_UPDATED
-  POST_DELETED
-}
-
 type PostSubscriptionPayload {
-  eventType: PostEventType!
-  post: Post!
+  mutation: MutationType!
+  node: Post
 }
 
 input CreateCommentInput {
@@ -91,13 +85,13 @@ type Comment {
   post: Post!
 }
 
-enum CommentEventType {
-  COMMENT_CREATED
-  COMMENT_UPDATED
-  COMMENT_DELETED
+enum MutationType {
+  CREATED
+  UPDATED
+  DELETED
 }
 
 type CommentSubscriptionPayload {
-  eventType: CommentEventType!
-  comment: Comment!
+  mutation: MutationType!
+  node: Comment
 }
