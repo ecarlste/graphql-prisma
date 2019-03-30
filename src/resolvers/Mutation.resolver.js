@@ -1,6 +1,14 @@
+import bcrypt from 'bcryptjs';
+
 const Mutation = {
-  createUser(_, { data }, { prisma }, info) {
-    return prisma.mutation.createUser({ data }, info);
+  async createUser(_, { data }, { prisma }, info) {
+    if (data.password.length < 8) {
+      throw new Error('Password must be at least 8 charactes.');
+    }
+
+    const password = await bcrypt.hash(data.password, 10);
+
+    return prisma.mutation.createUser({ data: { ...data, password } }, info);
   },
   updateUser(_, { id, data }, { prisma }, info) {
     return prisma.mutation.updateUser({ where: { id }, data }, info);
