@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import getUserId from '../utils/getUserId';
 
 const authenticateFailedMessage = 'Unable to authenticate user.';
 const Mutation = {
@@ -35,14 +36,16 @@ const Mutation = {
   deleteUser(_, { id }, { prisma }, info) {
     return prisma.mutation.deleteUser({ where: { id } }, info);
   },
-  createPost(_, args, { prisma }, info) {
-    const { author: id, ...data } = args.data;
+  createPost(_, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+    const { data } = args;
+
     return prisma.mutation.createPost(
       {
         data: {
           ...data,
           author: {
-            connect: { id }
+            connect: { id: userId }
           }
         }
       },

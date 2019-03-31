@@ -1,12 +1,11 @@
 import { GraphQLServer, PubSub } from 'graphql-yoga';
-import db from './db';
+import prisma from './prisma';
 import Comment from './resolvers/Comment.resolver';
 import Mutation from './resolvers/Mutation.resolver';
 import Post from './resolvers/Post.resolver';
 import Query from './resolvers/Query.resolver';
 import Subscription from './resolvers/Subscription.resolver';
 import User from './resolvers/User.resolver';
-import prisma from './prisma';
 
 const pubsub = new PubSub();
 
@@ -20,10 +19,12 @@ const server = new GraphQLServer({
     User,
     Comment
   },
-  context: {
-    db,
-    pubsub,
-    prisma
+  context(request) {
+    return {
+      pubsub,
+      prisma,
+      request
+    };
   }
 });
 
