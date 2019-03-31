@@ -30,11 +30,15 @@ const Mutation = {
 
     return { user, token: jwt.sign({ userId: user.id }, 'thisisasecret') };
   },
-  updateUser(_, { id, data }, { prisma }, info) {
-    return prisma.mutation.updateUser({ where: { id }, data }, info);
+  updateUser(_, { data }, { prisma, request }, info) {
+    const userId = getUserId(request);
+
+    return prisma.mutation.updateUser({ where: { id: userId }, data }, info);
   },
-  deleteUser(_, { id }, { prisma }, info) {
-    return prisma.mutation.deleteUser({ where: { id } }, info);
+  deleteUser(_, _1, { prisma, request }, info) {
+    const userId = getUserId(request);
+
+    return prisma.mutation.deleteUser({ where: { id: userId } }, info);
   },
   createPost(_, args, { prisma, request }, info) {
     const userId = getUserId(request);
@@ -55,7 +59,20 @@ const Mutation = {
   updatePost(_, { id, data }, { prisma }, info) {
     return prisma.mutation.updatePost({ where: { id }, data }, info);
   },
-  deletePost(_, { id }, { prisma }, info) {
+  async deletePost(_, { id }, { prisma, request }, info) {
+    const userId = getUserId(request);
+
+    const userOwnsPost = await prisma.exists.Post({
+      id,
+      author: {
+        id: userId
+      }
+    });
+
+    if (!userOwnsPost) {
+      throw new Error('Unable to delete post: User does not own a post with the specified ID');
+    }
+
     return prisma.mutation.deletePost({ where: { id } }, info);
   },
   createComment(_, args, { prisma }, info) {
