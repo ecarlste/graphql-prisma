@@ -56,7 +56,20 @@ const Mutation = {
       info
     );
   },
-  updatePost(_, { id, data }, { prisma }, info) {
+  async updatePost(_, { id, data }, { prisma, request }, info) {
+    const userId = getUserId(request);
+
+    const userOwnsPost = await prisma.exists.Post({
+      id,
+      author: {
+        id: userId
+      }
+    });
+
+    if (!userOwnsPost) {
+      throw new Error('Unable to update post: User does not own a post with the specified ID');
+    }
+
     return prisma.mutation.updatePost({ where: { id }, data }, info);
   },
   async deletePost(_, { id }, { prisma, request }, info) {
@@ -75,15 +88,17 @@ const Mutation = {
 
     return prisma.mutation.deletePost({ where: { id } }, info);
   },
-  createComment(_, args, { prisma }, info) {
-    const { author, post, ...data } = args.data;
+  async createComment(_, args, { prisma, request }, info) {
+    const { text, post } = args.data;
+    const userId = getUserId(request);
+
     return prisma.mutation.createComment(
       {
         data: {
-          ...data,
+          text,
           author: {
             connect: {
-              id: author
+              id: userId
             }
           },
           post: {
@@ -96,10 +111,40 @@ const Mutation = {
       info
     );
   },
-  updateComment(_, { id, data }, { prisma }, info) {
+  async updateComment(_, { id, data }, { prisma, request }, info) {
+    const userId = getUserId(request);
+
+    const userOwnsComment = await prisma.exists.Comment({
+      id,
+      author: {
+        id: userId
+      }
+    });
+
+    if (!userOwnsComment) {
+      throw new Error(
+        'Unable to update comment: User does not own a comment with the specified ID'
+      );
+    }
+
     return prisma.mutation.updateComment({ where: { id }, data }, info);
   },
-  deleteComment(_, { id }, { prisma }, info) {
+  async deleteComment(_, { id }, { prisma, request }, info) {
+    const userId = getUserId(request);
+
+    const userOwnsComment = await prisma.exists.Comment({
+      id,
+      author: {
+        id: userId
+      }
+    });
+
+    if (!userOwnsComment) {
+      throw new Error(
+        'Unable to delete comment: User does not own a comment with the specified ID'
+      );
+    }
+
     return prisma.mutation.deleteComment({ where: { id } }, info);
   }
 };
