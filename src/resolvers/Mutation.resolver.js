@@ -92,6 +92,12 @@ const Mutation = {
     const { text, post } = args.data;
     const userId = getUserId(request);
 
+    const publishedPost = await prisma.exists.Post({ published: true, id: post });
+
+    if (!publishedPost) {
+      throw new Error('Unable to find published post with specified ID');
+    }
+
     return prisma.mutation.createComment(
       {
         data: {
