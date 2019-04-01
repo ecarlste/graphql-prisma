@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import generateToken from '../utils/generateToken';
 import getUserId from '../utils/getUserId';
 
 const authenticateFailedMessage = 'Unable to authenticate user.';
@@ -17,7 +17,7 @@ const Mutation = {
       throw new Error(authenticateFailedMessage);
     }
 
-    return { user, token: jwt.sign({ userId: user.id }, 'thisisasecret') };
+    return { user, token: generateToken(user.id) };
   },
   async createUser(_, { data }, { prisma }) {
     if (data.password.length < 8) {
@@ -28,7 +28,7 @@ const Mutation = {
 
     const user = await prisma.mutation.createUser({ data: { ...data, password } });
 
-    return { user, token: jwt.sign({ userId: user.id }, 'thisisasecret') };
+    return { user, token: generateToken(user.id) };
   },
   updateUser(_, { data }, { prisma, request }, info) {
     const userId = getUserId(request);
