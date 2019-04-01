@@ -51,7 +51,7 @@ export default {
   post(_, { id }, { prisma, request }, info) {
     const userId = getUserId(request, false);
 
-    return prisma.query.post(
+    const posts = prisma.query.posts(
       {
         where: {
           id,
@@ -69,5 +69,11 @@ export default {
       },
       info
     );
+
+    if (posts.length === 0) {
+      throw new Error('Post not found.');
+    }
+
+    return posts[0];
   }
 };
