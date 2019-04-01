@@ -1,6 +1,6 @@
 import { GraphQLServer, PubSub } from 'graphql-yoga';
 import prisma from './prisma';
-import resolvers from './resolvers';
+import resolvers, { fragmentReplacements } from './resolvers';
 
 const pubsub = new PubSub();
 
@@ -13,7 +13,8 @@ const server = new GraphQLServer({
       prisma,
       request
     };
-  }
+  },
+  fragmentReplacements
 });
 
 server.start(() => console.log('GraphQL server is up...'));
