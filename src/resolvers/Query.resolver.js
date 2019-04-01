@@ -20,19 +20,45 @@ export default {
     return prisma.query.users(opArgs, info);
   },
   async posts(_, args, { prisma }, info) {
-    const opArgs = {};
+    const opArgs = {
+      where: {
+        published: true
+      }
+    };
 
     if (args.query) {
-      opArgs.where = {
-        OR: [
-          {
-            title_contains: args.query
-          },
-          {
-            body_contains: args.query
-          }
-        ]
-      };
+      opArgs.where.OR = [
+        {
+          title_contains: args.query
+        },
+        {
+          body_contains: args.query
+        }
+      ];
+    }
+
+    return prisma.query.posts(opArgs, info);
+  },
+  async myPosts(_, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+
+    const opArgs = {
+      where: {
+        author: {
+          id: userId
+        }
+      }
+    };
+
+    if (args.query) {
+      opArgs.where.OR = [
+        {
+          title_contains: args.query
+        },
+        {
+          body_contains: args.query
+        }
+      ];
     }
 
     return prisma.query.posts(opArgs, info);
@@ -40,13 +66,12 @@ export default {
   comments(_, _1, { prisma }, info) {
     return prisma.query.comments(null, info);
   },
-  me() {
-    return {
-      id: '123',
-      name: 'Erik',
-      email: 'ecarlste@gmail.com',
-      age: null
-    };
+  me(_, _1, { prisma, request }, info) {
+    const userId = getUserId(request);
+
+    const user = prisma.query.user({ where: { id: userId } }, info);
+
+    return user;
   },
   post(_, { id }, { prisma, request }, info) {
     const userId = getUserId(request, false);
