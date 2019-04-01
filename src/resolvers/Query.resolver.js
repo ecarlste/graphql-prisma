@@ -1,3 +1,5 @@
+import getUserId from '../utils/getUserId';
+
 export default {
   users(_, args, { prisma }, info) {
     const opArgs = {};
@@ -46,12 +48,26 @@ export default {
       age: null
     };
   },
-  post() {
-    return {
-      id: 'xyz',
-      title: 'first post',
-      body: 'best post NA... duh...',
-      published: false
-    };
+  post(_, { id }, { prisma, request }, info) {
+    const userId = getUserId(request, false);
+
+    return prisma.query.post(
+      {
+        where: {
+          id,
+          OR: [
+            {
+              published: true
+            },
+            {
+              author: {
+                id: userId
+              }
+            }
+          ]
+        }
+      },
+      info
+    );
   }
 };
