@@ -12,6 +12,25 @@ const User = {
 
       return null;
     }
+  },
+  posts: {
+    fragment: 'fragment userId on User { id }',
+    resolve(parent, args, { prisma }) {
+      return prisma.query.posts({
+        where: {
+          AND: [
+            {
+              published: true
+            },
+            {
+              author: {
+                id: parent.id
+              }
+            }
+          ]
+        }
+      });
+    }
   }
 };
 
