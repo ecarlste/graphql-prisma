@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import generateToken from '../utils/generateToken';
 import getUserId from '../utils/getUserId';
+import hashPassword from '../utils/hashPassword';
 
 const authenticateFailedMessage = 'Unable to authenticate user.';
 const Mutation = {
@@ -20,20 +21,21 @@ const Mutation = {
     return { user, token: generateToken(user.id) };
   },
   async createUser(_, { data }, { prisma }) {
-    if (data.password.length < 8) {
-      throw new Error('Password must be at least 8 charactes.');
-    }
-
-    const password = await bcrypt.hash(data.password, 10);
+    const password = await hashPassword(data.password);
 
     const user = await prisma.mutation.createUser({ data: { ...data, password } });
 
     return { user, token: generateToken(user.id) };
   },
-  updateUser(_, { data }, { prisma, request }, info) {
+  async updateUser(_, { data }, { prisma, request }, info) {
+    let password;
+    if (typeof data.password === 'string') {
+      password = await hashPassword(data.password);
+    }
+
     const userId = getUserId(request);
 
-    return prisma.mutation.updateUser({ where: { id: userId }, data }, info);
+    return prisma.mutation.updateUser({ where: { id: userId }, data: { ...data, password } }, info);
   },
   deleteUser(_, _1, { prisma, request }, info) {
     const userId = getUserId(request);
