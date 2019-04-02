@@ -4,7 +4,8 @@ export default {
   users(_, args, { prisma }, info) {
     const opArgs = {
       first: args.first,
-      skip: args.skip
+      skip: args.skip,
+      after: args.after
     };
 
     if (args.query) {
@@ -25,7 +26,8 @@ export default {
         published: true
       },
       first: args.first,
-      skip: args.skip
+      skip: args.skip,
+      after: args.after
     };
 
     if (args.query) {
@@ -49,7 +51,10 @@ export default {
         author: {
           id: userId
         }
-      }
+      },
+      first: args.first,
+      skip: args.skip,
+      after: args.after
     };
 
     if (args.query) {
@@ -65,8 +70,14 @@ export default {
 
     return prisma.query.posts(opArgs, info);
   },
-  comments(_, _1, { prisma }, info) {
-    return prisma.query.comments(null, info);
+  comments(_, args, { prisma }, info) {
+    const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after
+    };
+
+    return prisma.query.comments(opArgs, info);
   },
   me(_, _1, { prisma, request }, info) {
     const userId = getUserId(request);
