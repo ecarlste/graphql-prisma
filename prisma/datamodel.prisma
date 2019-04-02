@@ -5,6 +5,8 @@ type User {
   password: String!
   posts: [Post!]! @relation(name: "PostsByUser", onDelete: CASCADE)
   comments: [Comment!]! @relation(name: "CommentsByUser", onDelete: CASCADE)
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Post {
@@ -14,6 +16,8 @@ type Post {
   published: Boolean!
   author: User! @relation(name: "PostsByUser")
   comments: [Comment!]! @relation(name: "CommentsByPost", onDelete: CASCADE)
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Comment {
@@ -21,4 +25,6 @@ type Comment {
   text: String!
   author: User! @relation(name: "CommentsByUser")
   post: Post! @relation(name: "CommentsByPost")
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
